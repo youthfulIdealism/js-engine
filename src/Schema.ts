@@ -1,0 +1,1 @@
+export type Schema = { [key: string]: 'string' | 'number' | 'boolean' | Schema | Schema[] };
