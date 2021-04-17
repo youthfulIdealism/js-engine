@@ -250,7 +250,7 @@ class Camera {
         let half_height = (canvas.height / this.zoom) / 2;
         let location_zoomed_x = location.x / this.zoom;
         let location_zoomed_y = location.y / this.zoom;
-        return new Victor__default['default'](location_zoomed_x - rect.left + this.location.x - half_width, location_zoomed_y - rect.top + this.location.y - half_height);
+        return new Victor__default['default'](location_zoomed_x - rect.left + this.location.x / this.zoom - half_width, location_zoomed_y - rect.top + this.location.y / this.zoom - half_height);
     }
 }
 
@@ -258,8 +258,24 @@ class InputManager {
     constructor(sim_space) {
         this.sim_space = sim_space;
         this.keyboard = {};
+        this.mouse = {
+            location: new Victor__default['default'](0, 0),
+            mouse1: {
+                is_down: false,
+                went_down: false,
+                went_up: false,
+            },
+            mouse2: {
+                is_down: false,
+                went_down: false,
+                went_up: false,
+            }
+        };
         window.addEventListener("keydown", this.on_key_down.bind(this));
         window.addEventListener("keyup", this.on_key_up.bind(this));
+        window.addEventListener('mousedown', this.on_mouse_down.bind(this));
+        window.addEventListener('mouseup', this.on_mouse_up.bind(this));
+        window.addEventListener('mousemove', this.on_mouse_move.bind(this));
     }
     on_key_down(event) {
         let key = event.key;
@@ -284,6 +300,38 @@ class InputManager {
         }
         this.keyboard[key].is_down = false;
         this.keyboard[key].went_up = true;
+    }
+    on_mouse_down(event) {
+        if (isNaN(event.clientX) || event.clientX === null || event.clientX === undefined || isNaN(event.clientY) || event.clientY === null || event.clientY === undefined) {
+            return;
+        }
+        let mouse = undefined;
+        if (event.button === 0) {
+            mouse = this.mouse.mouse1;
+        }
+        if (event.button === 2) {
+            mouse = this.mouse.mouse2;
+        }
+        if (mouse) {
+            mouse.is_down = true;
+            mouse.went_down = true;
+        }
+    }
+    on_mouse_up(event) {
+        let mouse = undefined;
+        if (event.button === 0) {
+            mouse = this.mouse.mouse1;
+        }
+        if (event.button === 2) {
+            mouse = this.mouse.mouse2;
+        }
+        if (mouse) {
+            mouse.is_down = false;
+            mouse.went_up = true;
+        }
+    }
+    on_mouse_move(event) {
+        this.mouse.location = new Victor__default['default'](event.clientX, event.clientY);
     }
     is_key_down(key) {
         if (!this.keyboard[key]) {
@@ -314,10 +362,17 @@ class InputManager {
             keydata.went_down = false;
             keydata.went_up = false;
         }
+        this.mouse.mouse1.went_down = false;
+        this.mouse.mouse1.went_up = false;
+        this.mouse.mouse2.went_down = false;
+        this.mouse.mouse2.went_up = false;
     }
     destroy() {
         window.removeEventListener("keydown", this.on_key_down);
         window.removeEventListener("keyup", this.on_key_up);
+        window.removeEventListener("mousedown", this.on_mouse_down);
+        window.removeEventListener("mouseup", this.on_mouse_up);
+        window.removeEventListener("mousemove", this.on_mouse_move);
     }
 }
 

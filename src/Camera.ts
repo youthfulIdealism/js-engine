@@ -20,7 +20,7 @@ export abstract class Camera {
         let location_zoomed_y = location.y / this.zoom;
 
 
-        return new Victor(location_zoomed_x - rect.left + this.location.x - half_width, location_zoomed_y - rect.top + this.location.y - half_height);
+        return new Victor(location_zoomed_x - rect.left + this.location.x / this.zoom - half_width, location_zoomed_y - rect.top + this.location.y / this.zoom - half_height);
     }
 
     abstract update(tpf: number, sim_space: SimSpace): void
