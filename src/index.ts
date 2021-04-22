@@ -9,8 +9,9 @@ import { BlockRenderer } from './renderers/BlockRenderer';
 import { MaskRenderer } from './renderers/MaskRenderer';
 import { WholeScreenRenderer } from './renderers/WholeScreenRenderer';
 import { ChaseCamera } from './cameras/ChaseCamera';
+import { behavior_change_animation } from './behaviors/BehaviorChangeAnimation';
 
-export { Entity, SimSpace, Behavior, Renderer, Camera, ImageRenderer, BlockRenderer, MaskRenderer, ChaseCamera, InputManager, WholeScreenRenderer, behavior_registry, renderer_registry };
+export { Entity, SimSpace, Behavior, Renderer, Camera, ImageRenderer, BlockRenderer, MaskRenderer, ChaseCamera, InputManager, WholeScreenRenderer, behavior_registry, renderer_registry, behavior_change_animation };
 
 let hidden_area = document.createElement('div');
 hidden_area.id = 'hidden_area_for_js_engine_internals';

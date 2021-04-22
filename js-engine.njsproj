@@ -55,6 +55,7 @@
     <Folder Include="dist\" />
     <Folder Include="src\" />
     <Folder Include="src\cameras\" />
+    <Folder Include="src\behaviors\" />
     <Folder Include="src\serialization\" />
     <Folder Include="src\renderers\" />
   </ItemGroup>
@@ -65,12 +66,16 @@
     <TypeScriptCompile Include="src\Behavior.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="src\behaviors\BehaviorChangeAnimation.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="src\Camera.ts" />
     <TypeScriptCompile Include="src\cameras\ChaseCamera.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
     <TypeScriptCompile Include="src\Renderer.ts" />
     <TypeScriptCompile Include="src\renderers\BlockRenderer.ts" />
+    <TypeScriptCompile Include="src\renderers\AnimationRenderer.ts" />
     <TypeScriptCompile Include="src\renderers\WholeScreenRenderer.ts" />
     <TypeScriptCompile Include="src\renderers\MaskRenderer.ts" />
     <TypeScriptCompile Include="src\renderers\ImageRenderer.ts" />

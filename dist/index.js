@@ -576,6 +576,29 @@ class ChaseCamera extends Camera {
     }
 }
 
+let behavior_change_animation = new Behavior('change_animation', (entity, sim_space, behavior_parameters, context) => {
+    if (!behavior_parameters.change_to) {
+        return false;
+    }
+    if (!behavior_parameters.priority) {
+        behavior_parameters.priority = 0;
+    }
+    if (!entity.memory.animations) {
+        console.log(`no animation found.`);
+        return false;
+    }
+    if (!entity.memory.animations[behavior_parameters.change_to]) {
+        console.log(`animation ${behavior_parameters.change_to} not found.`);
+        return false;
+    }
+    if (entity.memory.animation.interruptable === false || entity.memory.priority > behavior_parameters.priority) {
+        return false;
+    }
+    entity.memory.animation = entity.memory.animation = entity.memory.animations[behavior_parameters.change_to];
+    entity.memory.animation_progress = 0;
+    return false;
+}, { 'change_to': 'string', 'priority': 'number' });
+
 let hidden_area = document.createElement('div');
 hidden_area.id = 'hidden_area_for_js_engine_internals';
 hidden_area.style.display = 'none';
@@ -592,5 +615,6 @@ exports.MaskRenderer = MaskRenderer;
 exports.Renderer = Renderer;
 exports.SimSpace = SimSpace;
 exports.WholeScreenRenderer = WholeScreenRenderer;
+exports.behavior_change_animation = behavior_change_animation;
 exports.behavior_registry = behavior_registry;
 exports.renderer_registry = renderer_registry;
