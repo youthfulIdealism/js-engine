@@ -29,30 +29,39 @@ export class AnimationRenderer extends Renderer {
             if (!animation) { return; }
             if (!animation_frames) { return; }
             if (!entity.memory.animation_progress) { entity.memory.animation_progress = 0; }
+            if (!entity.memory.animation_current_frame) { entity.memory.animation_current_frame = 0; }
 
-            let animation_current_frame_index = animation.current_frame;
-            let animation_current_frame = animation_frames[animation_current_frame_index];
+            let animation_current_frame_index = entity.memory.animation_current_frame;
+            let current_frame = animation_frames[animation_current_frame_index];
            
 
             entity.memory.animation_progress += tpf;
-            while (entity.memory.animation_progress > animation_current_frame.duration) {
+            while (entity.memory.animation_progress > current_frame.duration) {
                 animation_current_frame_index++;
-                entity.memory.animation_progress -= animation_current_frame.duration;
-                if (animation_frames.length <= animation_current_frame_index){
-                    if (animation.type === 'loop') {
+                entity.memory.animation_progress -= current_frame.duration;
+                if (animation_current_frame_index >= animation_frames.length) {
+                    if (entity.memory.queued_animation) {
+                        animation_current_frame_index = 0;
+                        entity.memory.animation_progress = 0;
+                        entity.memory.animation_current_frame = 0;
+                        entity.memory.animation = entity.memory.animations[entity.memory.queued_animation];
+                        entity.memory.animation_progress = 0;
+                    }
+                    else if (animation.type === 'loop') {
                         animation_current_frame_index = 0;
                     }
-                    if (animation.type === 'finish') {
+                    else if (animation.type === 'stick') {
                         animation_current_frame_index = animation_frames.length - 1;
                     }
                 }
-                animation_current_frame = animation_frames[animation_current_frame_index];
+                current_frame = animation_frames[animation_current_frame_index];
+                entity.memory.animation_current_frame = animation_current_frame_index;
             }
 
-            let image_path = animation_current_frame.image;
+            let image_path = current_frame.image;
             if (!image_path) { continue; }
 
-            let image = asset_manager.get_image(entity.render_data[this.id].image);
+            let image = asset_manager.get_image(image_path);
             renderer.drawImage(image, entity.location.x - image.width / 2, entity.location.y - image.height / 2);
         }
     }

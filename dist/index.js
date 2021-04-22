@@ -428,6 +428,70 @@ class BlockRenderer extends Renderer {
     }
 }
 
+class AnimationRenderer extends Renderer {
+    get schema() {
+        return {
+            'image': 'string',
+        };
+    }
+    render(tpf, asset_manager, camera, main_canvas, entities) {
+        let renderer = main_canvas.getContext('2d');
+        if (!renderer) {
+            throw new Error('Renderer is null');
+        }
+        renderer.resetTransform();
+        renderer.imageSmoothingEnabled = false;
+        renderer.translate(-camera.location.x + main_canvas.width / 2, -camera.location.y + main_canvas.height / 2);
+        renderer.scale(camera.zoom, camera.zoom);
+        for (let entity of entities) {
+            let animation = entity.memory.animation;
+            let animation_frames = animation.frames;
+            if (!animation) {
+                return;
+            }
+            if (!animation_frames) {
+                return;
+            }
+            if (!entity.memory.animation_progress) {
+                entity.memory.animation_progress = 0;
+            }
+            if (!entity.memory.animation_current_frame) {
+                entity.memory.animation_current_frame = 0;
+            }
+            let animation_current_frame_index = entity.memory.animation_current_frame;
+            let current_frame = animation_frames[animation_current_frame_index];
+            entity.memory.animation_progress += tpf;
+            while (entity.memory.animation_progress > current_frame.duration) {
+                animation_current_frame_index++;
+                entity.memory.animation_progress -= current_frame.duration;
+                if (animation_current_frame_index >= animation_frames.length) {
+                    if (entity.memory.queued_animation) {
+                        animation_current_frame_index = 0;
+                        entity.memory.animation_progress = 0;
+                        entity.memory.animation_current_frame = 0;
+                        entity.memory.animation = entity.memory.animations[entity.memory.queued_animation];
+                        entity.memory.animation_progress = 0;
+                    }
+                    else if (animation.type === 'loop') {
+                        animation_current_frame_index = 0;
+                    }
+                    else if (animation.type === 'stick') {
+                        animation_current_frame_index = animation_frames.length - 1;
+                    }
+                }
+                current_frame = animation_frames[animation_current_frame_index];
+                entity.memory.animation_current_frame = animation_current_frame_index;
+            }
+            let image_path = current_frame.image;
+            if (!image_path) {
+                continue;
+            }
+            let image = asset_manager.get_image(image_path);
+            renderer.drawImage(image, entity.location.x - image.width / 2, entity.location.y - image.height / 2);
+        }
+    }
+}
+
 class MaskRenderer extends Renderer {
     constructor(id, entity_finder, texture_image_url, move_with_camera = false) {
         super(id, entity_finder);
@@ -604,6 +668,7 @@ hidden_area.id = 'hidden_area_for_js_engine_internals';
 hidden_area.style.display = 'none';
 document.body.appendChild(hidden_area);
 
+exports.AnimationRenderer = AnimationRenderer;
 exports.Behavior = Behavior;
 exports.BlockRenderer = BlockRenderer;
 exports.Camera = Camera;
