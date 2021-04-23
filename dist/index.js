@@ -672,6 +672,16 @@ let behavior_change_animation = new Behavior('change_animation', (entity, sim_sp
     return false;
 }, { 'change_to': 'string', 'priority': 'number' });
 
+let behavior_play_sound = new Behavior('play_sound', (entity, sim_space, behavior_parameters, context) => {
+    if (!behavior_parameters.sounds) {
+        return false;
+    }
+    let sound_path = (behavior_parameters.sounds[Math.floor(Math.random() * behavior_parameters.sounds.length)]).path;
+    let sound = sim_space.asset_manager.get_sound(sound_path);
+    sound.play();
+    return false;
+}, { 'sounds': [{ 'path': 'string' }] });
+
 let hidden_area = document.createElement('div');
 hidden_area.id = 'hidden_area_for_js_engine_internals';
 hidden_area.style.display = 'none';
@@ -690,5 +700,6 @@ exports.Renderer = Renderer;
 exports.SimSpace = SimSpace;
 exports.WholeScreenRenderer = WholeScreenRenderer;
 exports.behavior_change_animation = behavior_change_animation;
+exports.behavior_play_sound = behavior_play_sound;
 exports.behavior_registry = behavior_registry;
 exports.renderer_registry = renderer_registry;

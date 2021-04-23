@@ -11,5 +11,6 @@ import { MaskRenderer } from './renderers/MaskRenderer';
 import { WholeScreenRenderer } from './renderers/WholeScreenRenderer';
 import { ChaseCamera } from './cameras/ChaseCamera';
 import { behavior_change_animation } from './behaviors/BehaviorChangeAnimation';
-export { Entity, SimSpace, Behavior, Renderer, Camera, ImageRenderer, BlockRenderer, MaskRenderer, ChaseCamera, InputManager, WholeScreenRenderer, AnimationRenderer, behavior_registry, renderer_registry, behavior_change_animation };
+import { behavior_play_sound } from './behaviors/BehaviorPlaySound';
+export { Entity, SimSpace, Behavior, Renderer, Camera, ImageRenderer, BlockRenderer, MaskRenderer, ChaseCamera, InputManager, WholeScreenRenderer, AnimationRenderer, behavior_registry, renderer_registry, behavior_change_animation, behavior_play_sound };
 //# sourceMappingURL=index.d.ts.map
