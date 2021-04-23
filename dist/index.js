@@ -4,7 +4,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var uuid = require('uuid');
 var Victor = require('victor');
-require('fs');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -26,6 +25,7 @@ class Entity {
 class AssetManager {
     constructor() {
         this.images = {};
+        this.sounds = {};
     }
     get_image(path) {
         let image = this.images[path];
@@ -35,6 +35,15 @@ class AssetManager {
             this.images[path] = image;
         }
         return this.images[path];
+    }
+    get_sound(path) {
+        let sound = this.sounds[path];
+        if (!sound) {
+            sound = new Audio();
+            sound.src = path;
+            this.sounds[path] = sound;
+        }
+        return this.sounds[path];
     }
 }
 

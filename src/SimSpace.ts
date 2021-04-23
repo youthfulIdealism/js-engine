@@ -4,7 +4,6 @@ import { Entity } from './Entity';
 import { AssetManager } from './AssetManager';
 import { behavior_registry } from './Behavior';
 import { parse } from './serialization/serialization_helper';
-import 'fs';
 
 export class SimSpace {
     entities: { [key: string]: Entity }

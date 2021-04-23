@@ -2,7 +2,6 @@ import { Camera } from './Camera';
 import { Renderer } from './Renderer';
 import { Entity } from './Entity';
 import { AssetManager } from './AssetManager';
-import 'fs';
 export declare class SimSpace {
     entities: {
         [key: string]: Entity;
