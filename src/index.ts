@@ -12,8 +12,9 @@ import { WholeScreenRenderer } from './renderers/WholeScreenRenderer';
 import { ChaseCamera } from './cameras/ChaseCamera';
 import { behavior_change_animation } from './behaviors/BehaviorChangeAnimation';
 import { behavior_play_sound } from './behaviors/BehaviorPlaySound';
+import { behavior_particle } from './behaviors/BehaviorParticle';
 
-export { Entity, SimSpace, Behavior, Renderer, Camera, ImageRenderer, BlockRenderer, MaskRenderer, ChaseCamera, InputManager, WholeScreenRenderer, AnimationRenderer, behavior_registry, renderer_registry, behavior_change_animation, behavior_play_sound };
+export { Entity, SimSpace, Behavior, Renderer, Camera, ImageRenderer, BlockRenderer, MaskRenderer, ChaseCamera, InputManager, WholeScreenRenderer, AnimationRenderer, behavior_registry, renderer_registry, behavior_change_animation, behavior_play_sound, behavior_particle };
 
 let hidden_area = document.createElement('div');
 hidden_area.id = 'hidden_area_for_js_engine_internals';

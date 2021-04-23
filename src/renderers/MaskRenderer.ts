@@ -72,11 +72,22 @@ export class MaskRenderer extends Renderer {
         mask_renderer.scale(camera.zoom, camera.zoom);
 
         for (let entity of entities) {
-            let image_path = entity.render_data[this.id].image;
+            let render_data = entity.render_data[this.id];
+            let image_path = render_data.image;
             if (!image_path) { continue; }
-
             let image = asset_manager.get_image(entity.render_data[this.id].image);
-            mask_renderer.drawImage(image, entity.location.x - image.width / 2, entity.location.y - image.height / 2);
+
+            mask_renderer.save();
+            mask_renderer.translate(entity.location.x, entity.location.y);
+
+            if (render_data.scale !== undefined) { mask_renderer.scale(render_data.scale, render_data.scale); }
+            if (render_data.opacity !== undefined) { mask_renderer.globalAlpha = render_data.opacity; }
+            if (render_data.rotation !== undefined) { mask_renderer.rotate(render_data.rotation); }
+            mask_renderer.translate(-image.width / 2, -image.height / 2);
+            mask_renderer.drawImage(image, 0, 0);
+
+            mask_renderer.restore();
+            if (render_data.opacity !== undefined) { mask_renderer.globalAlpha = 1; }
         }
 
         //draw the texture image onto the mask

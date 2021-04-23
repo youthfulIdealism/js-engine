@@ -22,8 +22,7 @@ export class AssetManager {
     get_sound(path: string): HTMLAudioElement {
         let sound = this.sounds[path]
         if (!sound) {
-            sound = new Audio();
-            sound.src = path;
+            sound = new Audio(path);
             this.sounds[path] = sound;
         }
 

@@ -39,8 +39,7 @@ class AssetManager {
     get_sound(path) {
         let sound = this.sounds[path];
         if (!sound) {
-            sound = new Audio();
-            sound.src = path;
+            sound = new Audio(path);
             this.sounds[path] = sound;
         }
         return this.sounds[path];
@@ -401,12 +400,30 @@ class ImageRenderer extends Renderer {
         renderer.translate(-camera.location.x + main_canvas.width / 2, -camera.location.y + main_canvas.height / 2);
         renderer.scale(camera.zoom, camera.zoom);
         for (let entity of entities) {
-            let image_path = entity.render_data[this.id].image;
+            let render_data = entity.render_data[this.id];
+            let image_path = render_data.image;
             if (!image_path) {
                 continue;
             }
             let image = asset_manager.get_image(entity.render_data[this.id].image);
-            renderer.drawImage(image, entity.location.x - image.width / 2, entity.location.y - image.height / 2);
+            renderer.save();
+            renderer.translate(entity.location.x, entity.location.y);
+            if (render_data.opacity !== undefined) {
+                renderer.globalAlpha = render_data.opacity;
+            }
+            if (render_data.rotation !== undefined) {
+                renderer.rotate(render_data.rotation);
+            }
+            if (render_data.scale !== undefined) {
+                renderer.scale(render_data.scale, render_data.scale);
+            }
+            renderer.translate(-image.width / 2, -image.height / 2);
+            renderer.translate(0, 0);
+            renderer.drawImage(image, 0, 0);
+            renderer.restore();
+            if (render_data.opacity !== undefined) {
+                renderer.globalAlpha = 1;
+            }
         }
     }
 }
@@ -496,7 +513,24 @@ class AnimationRenderer extends Renderer {
                 continue;
             }
             let image = asset_manager.get_image(image_path);
-            renderer.drawImage(image, entity.location.x - image.width / 2, entity.location.y - image.height / 2);
+            let render_data = entity.render_data[this.id];
+            renderer.save();
+            renderer.translate(entity.location.x, entity.location.y);
+            if (render_data.opacity !== undefined) {
+                renderer.globalAlpha = render_data.opacity;
+            }
+            if (render_data.rotation !== undefined) {
+                renderer.rotate(render_data.rotation);
+            }
+            if (render_data.scale !== undefined) {
+                renderer.scale(render_data.scale, render_data.scale);
+            }
+            renderer.translate(-image.width, -image.height);
+            renderer.drawImage(image, 0, 0);
+            renderer.restore();
+            if (render_data.opacity !== undefined) {
+                renderer.globalAlpha = 1;
+            }
         }
     }
 }
@@ -563,12 +597,29 @@ class MaskRenderer extends Renderer {
         mask_renderer.translate(-camera.location.x + main_canvas.width / 2, -camera.location.y + main_canvas.height / 2);
         mask_renderer.scale(camera.zoom, camera.zoom);
         for (let entity of entities) {
-            let image_path = entity.render_data[this.id].image;
+            let render_data = entity.render_data[this.id];
+            let image_path = render_data.image;
             if (!image_path) {
                 continue;
             }
             let image = asset_manager.get_image(entity.render_data[this.id].image);
-            mask_renderer.drawImage(image, entity.location.x - image.width / 2, entity.location.y - image.height / 2);
+            mask_renderer.save();
+            mask_renderer.translate(entity.location.x, entity.location.y);
+            if (render_data.scale !== undefined) {
+                mask_renderer.scale(render_data.scale, render_data.scale);
+            }
+            if (render_data.opacity !== undefined) {
+                mask_renderer.globalAlpha = render_data.opacity;
+            }
+            if (render_data.rotation !== undefined) {
+                mask_renderer.rotate(render_data.rotation);
+            }
+            mask_renderer.translate(-image.width / 2, -image.height / 2);
+            mask_renderer.drawImage(image, 0, 0);
+            mask_renderer.restore();
+            if (render_data.opacity !== undefined) {
+                mask_renderer.globalAlpha = 1;
+            }
         }
         //draw the texture image onto the mask
         mask_renderer.resetTransform();
@@ -682,6 +733,79 @@ let behavior_play_sound = new Behavior('play_sound', (entity, sim_space, behavio
     return false;
 }, { 'sounds': [{ 'path': 'string' }] });
 
+function lerp(v0, v1, t) {
+    return v0 * (1 - t) + v1 * t;
+}
+let behavior_particle = new Behavior('particle', (entity, sim_space, behavior_parameters, context) => {
+    if (!behavior_parameters.renderer) {
+        return false;
+    }
+    if (!behavior_parameters.duration) {
+        return false;
+    }
+    if (!behavior_parameters.current_time) {
+        behavior_parameters.current_time = 0;
+    }
+    if (behavior_parameters.current_time > behavior_parameters.duration) {
+        sim_space.remove_entity(entity);
+        return true;
+    }
+    let current_entity_location = entity.location;
+    let tpf = context.tpf ? context.tpf : 1;
+    let render_data = entity.render_data[behavior_parameters.renderer];
+    let lerp_factor = behavior_parameters.current_time / behavior_parameters.duration;
+    behavior_parameters.current_time += tpf;
+    let start_scale = behavior_parameters.start_scale;
+    let end_scale = behavior_parameters.end_scale;
+    let start_opacity = behavior_parameters.start_opacity;
+    let end_opacity = behavior_parameters.end_opacity;
+    let start_rotation = behavior_parameters.start_rotation;
+    let end_rotation = behavior_parameters.end_rotation;
+    if (render_data) {
+        if (start_scale !== undefined && end_scale !== undefined) {
+            render_data.scale = lerp(start_scale, end_scale, lerp_factor);
+            console.log(`${start_scale} -> ${end_scale} by ${lerp_factor} is ${render_data.scale}`);
+        }
+        if (start_opacity !== undefined && end_opacity !== undefined) {
+            render_data.opacity = lerp(start_opacity, end_opacity, lerp_factor);
+        }
+        if (start_rotation !== undefined && end_rotation !== undefined) {
+            if (!behavior_parameters.rotation_before_particle) {
+                behavior_parameters.rotation_before_particle = render_data.rotation ? render_data.rotation : 0;
+            }
+            if (!behavior_parameters.current_rotation_modifier) {
+                behavior_parameters.current_rotation_modifier = 0;
+            }
+            behavior_parameters.current_rotation_modifier = lerp(start_rotation, end_rotation, lerp_factor);
+            render_data.rotation = behavior_parameters.rotation_before_particle + behavior_parameters.current_rotation_modifier;
+        }
+    }
+    if (behavior_parameters.velocity) {
+        if (!behavior_parameters.acceleration) {
+            behavior_parameters.acceleration = 1;
+        }
+        let acceleration = behavior_parameters.acceleration;
+        behavior_parameters.velocity *= acceleration;
+        let delta_location = behavior_parameters.direction.clone().multiply(new Victor__default['default'](behavior_parameters.velocity, behavior_parameters.velocity)).multiply(new Victor__default['default'](tpf, tpf));
+        current_entity_location.add(delta_location);
+    }
+    return false;
+}, {
+    'renderer': 'string',
+    'start_scale': 'number',
+    'end_scale': 'number',
+    'start_opacity': 'number',
+    'end_opacity': 'number',
+    'start_rotation': 'number',
+    'end_rotation': 'number',
+    'current_rotation_modifier': 'number',
+    'direction': { x: 'number', y: 'number' },
+    'velocity': 'number',
+    'acceleration': 'number',
+    'duration': 'number',
+    'current_time': 'number',
+});
+
 let hidden_area = document.createElement('div');
 hidden_area.id = 'hidden_area_for_js_engine_internals';
 hidden_area.style.display = 'none';
@@ -700,6 +824,7 @@ exports.Renderer = Renderer;
 exports.SimSpace = SimSpace;
 exports.WholeScreenRenderer = WholeScreenRenderer;
 exports.behavior_change_animation = behavior_change_animation;
+exports.behavior_particle = behavior_particle;
 exports.behavior_play_sound = behavior_play_sound;
 exports.behavior_registry = behavior_registry;
 exports.renderer_registry = renderer_registry;

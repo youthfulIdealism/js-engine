@@ -23,11 +23,24 @@ export class ImageRenderer extends Renderer {
         renderer.scale(camera.zoom, camera.zoom);
 
         for (let entity of entities) {
-            let image_path = entity.render_data[this.id].image;
+            let render_data = entity.render_data[this.id];
+            let image_path = render_data.image;
             if (!image_path) { continue; }
-
             let image = asset_manager.get_image(entity.render_data[this.id].image);
-            renderer.drawImage(image, entity.location.x - image.width / 2, entity.location.y - image.height / 2);
+
+            renderer.save();
+            renderer.translate(entity.location.x, entity.location.y);
+
+            if (render_data.opacity !== undefined) { renderer.globalAlpha = render_data.opacity; }
+            if (render_data.rotation !== undefined) { renderer.rotate(render_data.rotation); }
+            if (render_data.scale !== undefined) { renderer.scale(render_data.scale, render_data.scale); }
+            renderer.translate(-image.width / 2, -image.height / 2);
+            renderer.translate(0, 0);
+
+            
+            renderer.drawImage(image, 0, 0);
+            renderer.restore();
+            if (render_data.opacity !== undefined) { renderer.globalAlpha = 1; }
         }
     }
 }

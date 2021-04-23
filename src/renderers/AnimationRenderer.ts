@@ -60,9 +60,21 @@ export class AnimationRenderer extends Renderer {
 
             let image_path = current_frame.image;
             if (!image_path) { continue; }
-
             let image = asset_manager.get_image(image_path);
-            renderer.drawImage(image, entity.location.x - image.width / 2, entity.location.y - image.height / 2);
+            let render_data = entity.render_data[this.id];
+
+            renderer.save();
+            renderer.translate(entity.location.x, entity.location.y);
+
+            if (render_data.opacity !== undefined) { renderer.globalAlpha = render_data.opacity; }
+            if (render_data.rotation !== undefined) { renderer.rotate(render_data.rotation); }
+            if (render_data.scale !== undefined) { renderer.scale(render_data.scale, render_data.scale); }
+            renderer.translate(-image.width, -image.height);
+
+            
+            renderer.drawImage(image, 0, 0);
+            renderer.restore();
+            if (render_data.opacity !== undefined) { renderer.globalAlpha = 1; }
         }
     }
 }

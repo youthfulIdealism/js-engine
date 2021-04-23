@@ -66,6 +66,7 @@
     <TypeScriptCompile Include="src\Behavior.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="src\behaviors\BehaviorParticle.ts" />
     <TypeScriptCompile Include="src\behaviors\BehaviorPlaySound.ts" />
     <TypeScriptCompile Include="src\behaviors\BehaviorStateMachine.ts" />
     <TypeScriptCompile Include="src\behaviors\BehaviorChangeAnimation.ts">
