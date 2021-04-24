@@ -525,7 +525,7 @@ class AnimationRenderer extends Renderer {
             if (render_data.scale !== undefined) {
                 renderer.scale(render_data.scale, render_data.scale);
             }
-            renderer.translate(-image.width, -image.height);
+            renderer.translate(-image.width / 2, -image.height / 2);
             renderer.drawImage(image, 0, 0);
             renderer.restore();
             if (render_data.opacity !== undefined) {
@@ -764,7 +764,6 @@ let behavior_particle = new Behavior('particle', (entity, sim_space, behavior_pa
     if (render_data) {
         if (start_scale !== undefined && end_scale !== undefined) {
             render_data.scale = lerp(start_scale, end_scale, lerp_factor);
-            console.log(`${start_scale} -> ${end_scale} by ${lerp_factor} is ${render_data.scale}`);
         }
         if (start_opacity !== undefined && end_opacity !== undefined) {
             render_data.opacity = lerp(start_opacity, end_opacity, lerp_factor);
