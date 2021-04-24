@@ -80,9 +80,14 @@ export class MaskRenderer extends Renderer {
             mask_renderer.save();
             mask_renderer.translate(entity.location.x, entity.location.y);
 
-            if (render_data.scale !== undefined) { mask_renderer.scale(render_data.scale, render_data.scale); }
+            
             if (render_data.opacity !== undefined) { mask_renderer.globalAlpha = render_data.opacity; }
             if (render_data.rotation !== undefined) { mask_renderer.rotate(render_data.rotation); }
+
+            if (render_data.scale !== undefined) { mask_renderer.scale(render_data.scale, render_data.scale); }
+            if (render_data.scale_x !== undefined) { mask_renderer.scale(render_data.scale_x, 1); }
+            if (render_data.scale_y !== undefined) { mask_renderer.scale(1, render_data.scale_y); }
+
             mask_renderer.translate(-image.width / 2, -image.height / 2);
             mask_renderer.drawImage(image, 0, 0);
 

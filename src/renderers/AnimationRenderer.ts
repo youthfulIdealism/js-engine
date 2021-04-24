@@ -69,6 +69,8 @@ export class AnimationRenderer extends Renderer {
             if (render_data.opacity !== undefined) { renderer.globalAlpha = render_data.opacity; }
             if (render_data.rotation !== undefined) { renderer.rotate(render_data.rotation); }
             if (render_data.scale !== undefined) { renderer.scale(render_data.scale, render_data.scale); }
+            if (render_data.scale_x !== undefined) { renderer.scale(render_data.scale_x, 1); }
+            if (render_data.scale_y !== undefined) { renderer.scale(1, render_data.scale_y); }
             renderer.translate(-image.width / 2, -image.height / 2);
 
             
