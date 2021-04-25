@@ -124,6 +124,8 @@ export class SimSpace {
             }
             delete this.events_map[event_type][entity.id];
         }
+
+        this.fire_event('remove_entity', { entity: entity });
     }
 
     entity_add_tag(entity: Entity, tag: string) {

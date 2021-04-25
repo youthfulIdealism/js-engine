@@ -36,7 +36,8 @@ export class ImageRenderer extends Renderer {
             if (render_data.scale !== undefined) { renderer.scale(render_data.scale, render_data.scale); }
             if (render_data.scale_x !== undefined) { renderer.scale(render_data.scale_x, 1); }
             if (render_data.scale_y !== undefined) { renderer.scale(1, render_data.scale_y); }
-
+            if (render_data.offset_x !== undefined) { renderer.translate(render_data.offset_x, 0); }
+            if (render_data.offset_y !== undefined) { renderer.translate(0, render_data.offset_y); }
             renderer.translate(-image.width / 2, -image.height / 2);
             renderer.translate(0, 0);
 
